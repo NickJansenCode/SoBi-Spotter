@@ -1,0 +1,45 @@
+body{
+    height: 100%;
+    width: 100%;
+}
+
+#nav{
+    height: 10vh;
+}
+
+#main{
+    height: 90vh;
+}
+
+#map{
+    width: 65%;
+    height: 100%;
+}
+
+#search{
+    width: 100% !important;
+}
+
+@media only screen and (max-width: 768px){
+    #search{
+        width: 80% !important;
+    }
+}
+
+@media only screen and (max-width: 422px){
+    #search{
+        width: 70% !important;
+    }
+}
+
+@media only screen and (max-width: 302px){
+    #search{
+        width: 60% !important;
+    }
+}
+
+@media only screen and (max-width: 242px){
+    #search{
+        width: 47% !important;
+    }
+}
