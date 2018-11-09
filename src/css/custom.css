@@ -5,6 +5,7 @@ body{
 
 #nav{
     height: 10vh;
+    padding: 0 !important;
 }
 
 #main{
