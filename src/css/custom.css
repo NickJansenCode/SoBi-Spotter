@@ -3,6 +3,22 @@ body{
     width: 100%;
 }
 
+#infoboxText {
+    width: auto;
+    height: auto;
+    opacity: 0.85;
+    filter: alpha(opacity=85); /* For IE8 and earlier */;
+    background-color: black;
+    border-radius: 7px;
+    text-align: center;
+    padding: 25px;
+}
+
+.ignorePad{
+    margin-left: -25px; 
+    margin-top: -25px;
+}
+
 #nav{
     height: 10vh;
     padding: 0 !important;
