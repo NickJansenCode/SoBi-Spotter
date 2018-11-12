@@ -240,7 +240,9 @@ function loadMapScenario(init = true, filters = "") {
 
             $.ajax({
                 type: "GET",
-                url: "src/php/getSobiData.php",
+                url: "https://csunix.mohawkcollege.ca/~000395661/private/10133/beta/src/php/getSobiData.php",
+                username: "000395661",
+                password: "1234qwer",
                 success: function (data) {
 
                     for (var i = 0; i < data.length; i++) {
