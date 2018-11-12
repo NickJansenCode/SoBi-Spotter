@@ -14,12 +14,11 @@ for($i = 0; $i < count($csv); $i++){
 
 	if ($dumbFormatting){
 		$sobiArray[] =
-    	array(
-			'long' => $csv[$i][5],
-  	      	'lat' => $csv[$i][6],
-  	      	'name' => $csv[$i-1][2],
-			'desc' => $csv[$i-1][4],
-			'haskiosk' => $csv[$i][1]  
+    	array('long' => $csv[$i][5],
+  	      	  'lat' => $csv[$i][6],
+  	      	  'name' => $csv[$i-1][2],
+			  'desc' => $csv[$i-1][4],
+			  'haskiosk' => $csv[$i][1]  
 		   );
 		   
 		   $dumbFormatting = false;
