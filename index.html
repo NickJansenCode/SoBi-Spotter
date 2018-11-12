@@ -9,8 +9,11 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="src/css/custom.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=Ag-9UmaOu3hCq2d2bxFTnt2ryCnUmD81o8_dEMuHCqbAFJ0TMwiY1IuhzPUjRaC6&callback=loadMapScenario'></script>
     <script type="text/javascript" src="src/js/main.js"></script>
+    <script type="text/javascript" src="http://bililite.com/inc/bililiteRange.js"></script>
+    <script type="text/javascript" src="http://bililite.com/inc/jquery.sendkeys.js"></script>
     <title>SoBi Spotter</title>
 </head>
 
@@ -25,22 +28,19 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <form class="mx-2 my-auto d-inline" id="search">
+            <form class="mx-2 my-auto d-inline" id="search" onsubmit="return(false)">
                 <div class="input-group">
-                    <input type="text" class="form-control border border-right-0" placeholder="Search For A Location">
-                    <span class="input-group-append">
-                        <button class="btn btn-outline-secondary border border-left-0" type="button">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </span>
+                    <input type="text" class="form-control border border-right-0" id="searchBox" placeholder="Search For A Location">
                 </div>
             </form>
 
-            <div id="collapse" class="collapse navbar-collapse" style="z-index: 3; background-color: white; border: 3px solid black">
+            <div id="collapse" class="collapse navbar-collapse">
                 <ul class="navbar-nav d-block d-md-none">
-                    <li><a>2</a></li>
-                    <li><a>1</a></li>
-                    <li><a>3</a></li>
+                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Search</a></li>
+                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Get Directions</a></li>
+                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Find a Hub</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                 </ul>
             </div>
         </nav>
@@ -49,33 +49,94 @@
                 <h3> SoBi Spotter Info </h1>
                     <p class="small">Let's make your commute easier.</p>
                     <div class="row">
-                        <div class="col-sm-3">
-                            <img src="https://via.placeholder.com/100/">
+                        <div class="col-sm-2">
+                            <img src="src/img/search.png" width="60" height="60">
                         </div>
-                        <div class="col-sm-9">
-                            <a>Link 3</a>
+                        <div class="col-sm-10">
+                            <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Search</a>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-sm-2">
+                            <img src="src/img/navigate.png" width="60" height="60">
+                        </div>
+                        <div class="col-sm-10">
+                            <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Get Directions</a>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-sm-2">
+                            <img src="src/img/map.png" width="60" height="60">
+                        </div>
+                        <div class="col-sm-10">
+                            <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Find a Hub</a>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-sm-3">
-                            <img src="https://via.placeholder.com/100/">
-                        </div>
-                        <div class="col-sm-9">
-                            <a>Link 3</a>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-sm-3">
-                            <img src="https://via.placeholder.com/100/">
-                        </div>
-                        <div class="col-sm-9">
-                            <a>Link 3</a>
+                        <div class="col-sm-12">
+                            <a class="navlink" href="about.html">About</a> |
+                            <a class="navlink" href="contact.html">Contact</a> |
+                            <a class="navlink" href="https://github.com/NickJansenCode/SoBi-Spotter">Github</a> |
+                            <a class="navlink" href="https://openhamilton.ca">Open Hamilton</a>
                         </div>
                     </div>
             </div>
 
-            <div class="col-xs-12 col-md-9" style="border-left: 3px solid black">
-                <div id="map" class="ml-3 mx-auto my-auto w-100"> </div>
+            <div id="mainContent" class="col-xs-12 col-md-9">
+                <div class="row" id="container">
+                    <div class="col-xs-12 col-md-5" id="directionsInputContainer" style="display: inline"></div>
+                    <div class="col-xs-12 col-md-7" id="legend" style="display: inline">
+                        <div class="row">
+                            <h3 style="border-bottom: 2px solid black"> Legend </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6">
+                                <img src="src/img/bikeicon.png">
+                                <a>SoBi Hub</a>
+                            </div>
+
+                            <div class="col-xs-6 col-sm-6">
+                                <img src="src/img/greenbikeicon.png">
+                                <a>Closest SoBi Hub</a>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <img src="src/img/purplebikeicon.png">
+                                <a>Closest SoBi Hub With Kiosk</a>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <img src="src/img/usericon.png">
+                                <a>User Location</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row w-100">
+                    <div id="map" class="ml-3  my-auto w-100"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-content" class="modal-body">
+                    <pre id="modal-content-body"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
