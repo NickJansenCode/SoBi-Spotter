@@ -239,7 +239,7 @@ function loadMapScenario(init = true, filters = "") {
                 });
 
             $.ajax({
-                type: "GET",
+                type: "POST",
                 url: "https://csunix.mohawkcollege.ca/~000395661/private/10133/beta/src/php/getSobiData.php",
                 username: "000395661",
                 password: "1234qwer",
