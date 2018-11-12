@@ -269,6 +269,9 @@ function loadMapScenario(init = true, filters = "") {
                     // Draws the map (this is the default map load method). //
                     createMap(new Microsoft.Maps.Location(position.coords.latitude, position.coords.longitude), init, true, filters);
                 },
+                error: function(respone){
+                    console.log(response);
+                },
                 dataType: 'json',
                 async: 'false'
             });
