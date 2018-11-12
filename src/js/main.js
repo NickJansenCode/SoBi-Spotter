@@ -1077,14 +1077,14 @@ function createMap(position, init = false, permission = false, filter = "") {
             var imgSrc = "";
             if (listHubs[i].haskiosk == "Yes") {
                 if (i == minDistanceKioskIndex) {
-                    imgSrc = 'src/img/purplebikeicon';
+                    imgSrc = 'src/img/purplebikeicon.png';
                 }
             }
             else {
                 if (i == 0) {
                     imgSrc = 'src/img/usericon.png';
                 } else {
-                    imgSrc = i == minDistanceIndex ? 'src/img/greenbikeicon' : 'src/img/bikeicon';
+                    imgSrc = i == minDistanceIndex ? 'src/img/greenbikeicon.png' : 'src/img/bikeicon.png';
 
                 }
             }
