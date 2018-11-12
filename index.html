@@ -19,7 +19,7 @@
 
 <body>
 
-    <div class="container-fluid">
+    <div class="container">
         <nav class="navbar navbar-expand-md navbar-light" id="nav">
             <a class="navbar-brand d-none d-md-block" href="."><img src="src/img/image.png" width="50" height="40"></a>
 
@@ -36,11 +36,10 @@
 
             <div id="collapse" class="collapse navbar-collapse">
                 <ul class="navbar-nav d-block d-md-none">
-                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Search</a></li>
-                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Get Directions</a></li>
-                    <li><a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Find a Hub</a></li>
                     <li><a href="about.html">About</a></li>
                     <li><a href="contact.html">Contact</a></li>
+                    <li><a href="https://github.com/NickJansenCode/SoBi-Spotter">Github</a></li>
+                    <li><a href="https://openhamilton.ca">Open Hamilton</a></li>
                 </ul>
             </div>
         </nav>
@@ -50,23 +49,23 @@
                     <p class="small">Let's make your commute easier.</p>
                     <div class="row">
                         <div class="col-sm-2">
-                            <img src="src/img/search.png" width="60" height="60">
+                            <img src="src/img/search.png" width="40" height="40">
                         </div>
                         <div class="col-sm-10">
                             <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Search</a>
                         </div>
                     </div>
                     <div class="row mt-5">
-                        <div class="col-sm-2">
-                            <img src="src/img/navigate.png" width="60" height="60">
+                        <div class="col-xs-12 col-sm-2">
+                            <img src="src/img/navigate.png" width="40" height="40">
                         </div>
                         <div class="col-sm-10">
                             <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Get Directions</a>
                         </div>
                     </div>
                     <div class="row mt-5">
-                        <div class="col-sm-2">
-                            <img src="src/img/map.png" width="60" height="60">
+                        <div class="col-xs-12 col-sm-2">
+                            <img src="src/img/map.png" width="40" height="40">
                         </div>
                         <div class="col-sm-10">
                             <a href="#" class="modalLink" data-toggle="modal" data-target="#exampleModal">Find a Hub</a>
@@ -84,8 +83,8 @@
 
             <div id="mainContent" class="col-xs-12 col-md-9">
                 <div class="row" id="container">
-                    <div class="col-xs-12 col-md-5" id="directionsInputContainer" style="display: inline"></div>
-                    <div class="col-xs-12 col-md-7" id="legend" style="display: inline">
+                    <div class="col-xs-12 col-md-5" id="directionsInputContainer"></div>
+                    <div class="col-xs-12 col-md-7" id="legend">
                         <div class="row">
                             <h3 style="border-bottom: 2px solid black"> Legend </h3>
                         </div>
@@ -114,14 +113,14 @@
 
                     </div>
                 </div>
-                <div class="row w-100">
+                <div id="container" class="row w-100 h-100">
                     <div id="map" class="ml-3  my-auto w-100"> </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle"
+    <div class="modal fade modal-fullscreen" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

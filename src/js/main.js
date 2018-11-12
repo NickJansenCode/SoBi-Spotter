@@ -10,13 +10,13 @@ var infoboxTemplate = `
 </div>`
 
 var neighbourhoods = {
-    'Corktown': { 'lat': 43.2501284, 'long': -79.8714028 },
-    'Durand': { 'lat': 43.2511214, 'long': -79.8815258 },
-    'Stinson': { 'lat': 43.2507937, 'long': -79.8685812 },
-    'St. Clair': { 'lat': 43.245299, 'long': -79.8506123 },
+    'Corktown': { 'lat': 43.25064, 'long': -79.8688537 },
+    'Durand': { 'lat': 43.2505135, 'long': -79.8813224 },
+    'Stinson': { 'lat': 43.2484642, 'long': -79.8587936 },
+    'St. Clair': { 'lat': 43.245084, 'long': -79.8498687 },
     'Blakely': { 'lat': 43.2424412, 'long': -79.8450937 },
-    'Crown Point West': { 'lat': 43.2497846, 'long': -79.8309647 },
-    'Stipley': { 'lat': 43.2522747, 'long': -79.8410247 },
+    'Crown Point West': { 'lat': 43.2495557, 'long': -79.8274351 },
+    'Stipley': { 'lat': 43.2525073, 'long': -79.8380327 },
     'Gibson': { 'lat': 43.2547057, 'long': -79.8509757 },
     'Landsdale': { 'lat': 43.2571312, 'long': -79.860832 },
     'Beasly': { 'lat': 43.2596417, 'long': -79.8709197 },
@@ -43,7 +43,7 @@ Currently, the search feature of this app is limited to the
 following list of neighbourhoods in Hamilton, ON.
 <ul>
     <li>Corktown</li><li>Stinson</li><li>Durand</li><li>St.Clair</li><li>Blakely</li><li>Crown Point West</li><li>Stipley</li><li>Gibson</li><li>Landsdale</li><li>Beasly</li><li>Central Hamilton</li><li>Strathcona</li><li>NorthEnd</li><li>Industrial SectorA</li><li>Industrial SectorB</li><li>Industrial SectorC</li><li>Industrial SectorD</li><li>Kirkendall North</li><li>Kirkendall South</li><li>Chedoke Park B</li><li>Westdale North</li><li>Westdale South</li><li>Ainslie Wood North</li><li>Ainslie Wood East</li><li>Ainslie Wood</li><li>Dundas</li>
-</ul>
+</ul>\n
 To search, simply type in the search bar and select the 
 desired neighbourhood you wish to move the map to.
 `
@@ -174,7 +174,7 @@ function createMap(position, init = false, permission = false, filter = "") {
                     infobox.setOptions({
                         visible: true,
                         location: args.target.getLocation(),
-                        htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title)
+                        htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title).replace('{bodyContent}')
                     });
                 });
 
