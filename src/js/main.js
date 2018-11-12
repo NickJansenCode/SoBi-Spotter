@@ -174,7 +174,7 @@ function createMap(position, init = false, permission = false, filter = "") {
                     infobox.setOptions({
                         visible: true,
                         location: args.target.getLocation(),
-                        htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title).replace('{bodyContent}')
+                        htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title).replace('{bodyContent}', '')
                     });
                 });
 
