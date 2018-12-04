@@ -4,6 +4,10 @@ body{
     min-height: 500px;
 }
 
+#directionsContainer{
+    margin-left: 5%;
+}
+
 .container-fluid{
     height: 100vh;
 }
@@ -23,10 +27,27 @@ body{
     background-color: white;
     border: 1px solid lightgray;
     padding: 0;
+} 
+
+.ui-autocomplete {
+    position: relative;
 }
 
-.ui-menu-item:hover{
-    background-color: lightgray;
+.ui-helper-hidden-accessible{
+    display:none !important;
+}
+
+.ui-menu .ui-menu-item:hover, .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus {
+    background-color: lightblue;
+    font-weight: bold;
+}
+
+.ui-menu-item{
+    border: 0.5px solid lightgray;
+}
+
+.ui-widget.ui-widget-content {
+    border: 1px solid #d3d3d3;
 }
 
 .modal-dialog{
@@ -131,12 +152,19 @@ body{
         border-left: none;
     }
 
+    #directionsContainer{
+        margin-left: 0;
+    }
 
 }
 
 @media only screen and (max-width: 422px){
     #search{
         width: 70% !important;
+    }
+
+    #map{
+        margin-left: 0 !important;
     }
 
 

@@ -1,4 +1,16 @@
+// Some global variables. Don't ever do this. //
 var listHubs = [];
+var directionsSelectA;
+var directionsSelectB;
+var directionsManager;
+var map;
+var first = true;
+var minDistance = Number.MAX_SAFE_INTEGER;
+var minDistanceKiosk = Number.MAX_SAFE_INTEGER;
+var minDistanceIndex;
+var minDistanceKioskIndex;
+var toCoords;
+var fromCoords;
 
 // Custom infobox template. //
 var infoboxTemplate = `
@@ -6,9 +18,11 @@ var infoboxTemplate = `
     <div class="float-left ignorePad"> <a class="btn btn-danger" href="javascript:void(0)" onclick="(function(){infobox.setOptions({visible: false}) })();"> x </a> </div> 
     <div> {headerContent}  </div>
     <div> {bodyContent} </div>
-    <div><a onclick="copyToClipboard(infobox)" href="#"> Copy Point Data To Clipboard </a> </div>    
+    <div><a onclick="navigateFrom('{pointData}')"  href="#">Navigate From </a> </div>
+    <div><a onclick="navigateTo('{pointData}')" href="#">Navigate To</a></div>    
 </div>`
 
+// List of neighbourhoods for search. //
 var neighbourhoods = {
     'Corktown': { 'lat': 43.25064, 'long': -79.8688537 },
     'Durand': { 'lat': 43.2505135, 'long': -79.8813224 },
@@ -38,6 +52,7 @@ var neighbourhoods = {
     'Dundas': { 'lat': 43.265943, 'long': -79.953666 },
 }
 
+// Search Modal text content. //
 var searchContent = `
 Currently, the search feature of this app is limited to the
 following list of neighbourhoods in Hamilton, ON.
@@ -48,24 +63,21 @@ To search, simply type in the search bar and select the
 desired neighbourhood you wish to move the map to.
 `
 
+// Directions Modal text content. //
 var directionsContent = `
-To get the map to show the fastest route between two hubs,
-click on the icon for the hub you would like to choose as
-your start point and select "Copy Point Data To Clipboard".
-Paste the point data from your clipboard into the 'From' 
-input above the map.
+There is two methods to get the app to draw a route
+between two SoBi hubs. For the first method, simply
+select any two SoBi hubs from the drop down list
+and click "Calculate Route". The other method used
+to perform this task involves selecting pushpins on
+the map and clicking either "Navigate To" or "Navigate
+From" to control the selected hubs in the dropdown list.
 
-Follow the same directions to copy another icon's point
-data to your clipboard, and paste it into the 'To'
-input above the map.
-
-Click the 'Go' button to have the map calculate and overlay
-the route created on the map.
-
-You may also select and copy the point data from your 
-current location's icon (see legend). 
+If you wish to clear the directions off of the map, simply
+click the "Clear Route" button.
 `
 
+// Find A Hub Modal text content. //
 var findHubContent = `
 Currently, this map contains all of the known SoBi hubs
 in Hamilton, ON. To find a hub, simply navigate the map
@@ -81,15 +93,6 @@ by the bicycle rider icon.
 Along with the directions finding functionality, this
 app can allow you to upgrade your SoBi experience.
 `
-
-
-
-var minDistance = Number.MAX_SAFE_INTEGER;
-var minDistanceKiosk = Number.MAX_SAFE_INTEGER;
-var minDistanceIndex;
-var minDistanceKioskIndex;
-var toCoords;
-var fromCoords;
 
 // Uses the Haversine formula to determine the distance in km between two points. //
 // Shamelessly stolen from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula //
@@ -112,115 +115,162 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
-function createMap(position, init = false, permission = false, filter = "") {
-    // Gets the map div from the DOM. //
-    var map = new Microsoft.Maps.Map($("#map")[0], {
-        center: position,
-        zoom: 16
-    });
+// Main map drawing method. //
+function createMap(position, init = false, permission = false, filter = "", recenter = false) {
+    
+    // If we simply want to recenter the map, just set the map's center to the new coordinates. //
+    if (recenter) {
+        map.setView({
+            center: position,
+            zoom: 15
+        });
+    }
 
-    // If the user has provided location permissions, populates the map with pushpins and infoboxes. //
-    if (permission) {
+    if (init) {
+        // Gets the map div from the DOM. //
+        map = new Microsoft.Maps.Map($("#map")[0], {
+            center: position,
+            zoom: 12
+        });
 
-        // Creates the infobox that will be reused for the map. //
-        infobox = new Microsoft.Maps.Infobox(
-            new Microsoft.Maps.Location(0, 0),
-            {
-                title: "temp",
-                visible: false,
-                autoAlignment: true
-            });
+        // If the user has provided location permissions, populates the map with pushpins and infoboxes. //
+        if (permission) {
 
-        infobox.setMap(map);
-
-
-        for (var i = 0; i < listHubs.length; i++) {
-            var imgSrc = "";
-            if (listHubs[i].haskiosk == "Yes") {
-                if (i == minDistanceKioskIndex) {
-                    imgSrc = 'src/img/purplebikeicon';
-                }
-            }
-            else {
-                if (i == 0) {
-                    imgSrc = 'src/img/usericon.png';
-                } else {
-                    imgSrc = i == minDistanceIndex ? 'src/img/greenbikeicon' : 'src/img/bikeicon';
-
-                }
-            }
-
-
-            // Initializes some variables for the pushpin. //
-            let location = new Microsoft.Maps.Location(listHubs[i].lat, listHubs[i].long);
-            let pushPin = new Microsoft.Maps.Pushpin(location, { icon: imgSrc, anchor: new Microsoft.Maps.Point(12, 39) });
-            let title = listHubs[i].name;
-            let description = listHubs[i].desc;
-
-
-            // Sets some metadata for the pushPin. //
-            pushPin.metadata = {
-                title: title,
-                description: description
-            };
-
-
-            // This case handles the user's current location pin. Sets the infobox to just display //
-            // "current location" instead of all the other information that the rest do. //
-            if (i == 0) {
-
-                // Sets an onclick event handler for the pushpin that changes the infobox content and makes it pop up. //
-                Microsoft.Maps.Events.addHandler(pushPin, 'click', function (args) {
-                    infobox.setOptions({
-                        visible: true,
-                        location: args.target.getLocation(),
-                        htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title).replace('{bodyContent}')
-                    });
+            // Creates the infobox that will be reused for the map. //
+            infobox = new Microsoft.Maps.Infobox(
+                new Microsoft.Maps.Location(0, 0),
+                {
+                    title: "temp",
+                    visible: false,
+                    autoAlignment: true
                 });
 
-                // Pushes the pushpin to the map. //
-                map.entities.push(pushPin);
-            }
+            infobox.setMap(map);
 
-            // This case handles all of the rec centre pushpins. //
-            else {
 
-                // If the filter includes the city name of the rec centre. //
-                if (listHubs[i].desc.includes(filter)) {
+            // For each of the hubs in the list. //
+            for (var i = 0; i < listHubs.length; i++) {
+                
+                // Determines which icon to use for the pushpin. //
+                var imgSrc = "";
+                if (listHubs[i].haskiosk == "Yes") {
+                    if (i == minDistanceKioskIndex) {
+                        imgSrc = 'src/img/purplebikeicon';
+                    }
+                }
+                else {
+                    if (i == 0) {
+                        imgSrc = 'src/img/usericon.png';
+                    } else {
+                        imgSrc = i == minDistanceIndex ? 'src/img/greenbikeicon' : 'src/img/bikeicon';
 
-                    //Sets an onclick event handle for the pushpin that changes the infobox content //
-                    //(more detail than the user's location pin) and sets it to visible. //
+                    }
+                }
+
+
+                // Initializes some variables for the pushpin. //
+                let location = new Microsoft.Maps.Location(listHubs[i].lat, listHubs[i].long);
+                let pushPin = new Microsoft.Maps.Pushpin(location, { icon: imgSrc, anchor: new Microsoft.Maps.Point(12, 39) });
+                let title = listHubs[i].name;
+                let description = listHubs[i].desc;
+
+
+                // Sets some metadata for the pushPin. //
+                pushPin.metadata = {
+                    title: title,
+                    description: description
+                };
+
+
+                // This case handles the user's current location pin. Sets the infobox to just display //
+                // "current location" instead of all the other information that the rest do. //
+                if (i == 0) {
+
+                    // Sets an onclick event handler for the pushpin that changes the infobox content and makes it pop up. //
                     Microsoft.Maps.Events.addHandler(pushPin, 'click', function (args) {
                         infobox.setOptions({
                             visible: true,
                             location: args.target.getLocation(),
-                            htmlContent: infoboxTemplate.replace(
-                                '{headerContent}', args.target.metadata.title).replace(
-                                    '{bodyContent}', args.target.metadata.description)
-
+                            htmlContent: infoboxTemplate.replace('{headerContent}', args.target.metadata.title).replace(
+                                '{bodyContent}', "").replace('{pointData}', args.target.getLocation().latitude + ", " + args.target.getLocation().longitude).replace(
+                                    '{pointData}', args.target.getLocation().latitude + ", " + args.target.getLocation().longitude)
                         });
-
                     });
 
                     // Pushes the pushpin to the map. //
                     map.entities.push(pushPin);
-                };
+                }
+
+                // This case handles all of the rec centre pushpins. //
+                else {
+
+                    // If the filter includes the city name of the rec centre. //
+                    if (listHubs[i].desc.includes(filter)) {
+
+                        //Sets an onclick event handle for the pushpin that changes the infobox content //
+                        //(more detail than the user's location pin) and sets it to visible. //
+                        Microsoft.Maps.Events.addHandler(pushPin, 'click', function (args) {
+                            infobox.setOptions({
+                                visible: true,
+                                location: args.target.getLocation(),
+                                htmlContent: infoboxTemplate.replace(
+                                    '{headerContent}', args.target.metadata.title).replace(
+                                        '{bodyContent}', args.target.metadata.description).replace(
+                                            '{pointData}', args.target.getLocation().latitude + ", " + args.target.getLocation().longitude).replace(
+                                                '{pointData}', args.target.getLocation().latitude + ", " + args.target.getLocation().longitude)
+
+
+                            });
+
+                        });
+
+                        // Pushes the pushpin to the map. //
+                        map.entities.push(pushPin);
+                    };
+                }
+
+
             }
 
 
         }
 
+        //Load the directions module.
+        Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+            //Create an instance of the directions manager.
+            directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+        });
 
     }
 
-    //Load the directions module.
-    Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-        //Create an instance of the directions manager.
-        directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-        directionsManager.showInputPanel('directionsInputContainer');
-    });
-
 }
+
+// Timeout function used to update the user's current position (every 10 seconds). //
+setInterval(function () {
+    
+    // Gets current position. //
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+
+            // Remove and readd the user's current position to the list. //
+            listHubs.shift();
+            listHubs.unshift({
+                "long": position.coords.longitude,
+                "lat": position.coords.latitude,
+                "name": "Current Location",
+                "desc": "Current Location"
+            });
+
+            // Update the "current location" values in the drop down list. //
+            $("#hubSelectA option:first").val(position.coords.latitude + ", " + position.coords.longitude);
+            $("#hubSelectB option:first").val(position.coords.latitude + ", " + position.coords.longitude);
+
+            // Move the user location pushpin. //
+            map.entities.get(0).setLocation(new Microsoft.Maps.Location(position.coords.latitude, position.coords.longitude)); 
+        }
+    );
+}, 10000)
+
 
 // Callback method for the bing API script. //
 function loadMapScenario(init = true, filters = "") {
@@ -238,12 +288,24 @@ function loadMapScenario(init = true, filters = "") {
                     "haskiosk": false
                 });
 
+            // Add the location to both of the dropdown lists. //
+            $(".hubSelect").append('<option value="' + listHubs[0].lat + ", " + listHubs[0].long + '">' + listHubs[0].name + '</option>');
+            
+            // Init the directions waypoint values to both be the user's initial location. //
+            directionsSelectA = new Microsoft.Maps.Location(listHubs[0].lat, listHubs[0].long);
+            directionsSelectB = new Microsoft.Maps.Location(listHubs[0].lat, listHubs[0].long);
+
+
+            // AJAX call to our getSobiData php file. //
             $.ajax({
                 type: "GET",
                 url: "src/php/getSobiData.php",
                 success: function (data) {
 
+                    // For each of the hubs in the data, add the item to the list of hubs and add it to the drop down. //
+                    // Also figures out the closest hub to the user and the closest hub with a kiosk. //
                     for (var i = 0; i < data.length; i++) {
+                        $(".hubSelect").append('<option value="' + data[i].lat + ", " + data[i].long + '">' + data[i].name + '</option>');
 
                         let distance = getDistanceFromLatLonInKm(listHubs[0].lat, listHubs[0].long, data[i].lat, data[i].long)
 
@@ -269,7 +331,7 @@ function loadMapScenario(init = true, filters = "") {
                     // Draws the map (this is the default map load method). //
                     createMap(new Microsoft.Maps.Location(position.coords.latitude, position.coords.longitude), init, true, filters);
                 },
-                error: function(response){
+                error: function (response) {
                     console.log(response);
                 },
                 dataType: 'json',
@@ -289,9 +351,58 @@ function loadMapScenario(init = true, filters = "") {
 
 }
 
+// Sets the "navigate from" waypoint to be at the location of the pushpin infobox that called this method. //
+navigateFrom = function (point) {
+    $('#hubSelectB').val(point);
+    $('#hubSelectB').change();
+}
+
+// Sets the "navigate to" waypoint to be at the location of the pushpin infobox that called this method. //
+navigateTo = function (point) {
+    $('#hubSelectA').val(point);
+    $('#hubSelectA').change();
+}
+
 $(document).ready(function () {
 
+    // When the drop down list item is changed, updates the waypoint values. //
+    $("#hubSelectA").change(function (e) {
+        directionsSelectA = new Microsoft.Maps.Location(e.target.value.split(",")[0], e.target.value.split(",")[1]);
+    });
 
+    $("#hubSelectB").change(function (e) {
+        directionsSelectB = new Microsoft.Maps.Location(e.target.value.split(",")[0], e.target.value.split(",")[1]);
+    });
+
+    // Clears the directions from the map. //
+    $("#clearRouteBtn").click(function () {
+        directionsManager.clearAll();
+    })
+
+    // Calculates a route between two waypoints. //
+    $("#calculateRouteBtn").click(function () {
+
+        // Resets some options. //
+        directionsManager.clearAll();
+        directionsManager.setRenderOptions({
+            drivingPolylineOptions: {
+                strokeColor: 'red',
+                strokeThickness: 5
+            },
+            waypointPushpinOptions: {
+                title: ''
+            }
+        });
+
+        // Adds the selected waypoints, and calculates the directions. //
+        directionsManager.addWaypoint(new Microsoft.Maps.Directions.Waypoint({ location: directionsSelectA }));
+        directionsManager.addWaypoint(new Microsoft.Maps.Directions.Waypoint({ location: directionsSelectB }));
+
+        directionsManager.calculateDirections();
+
+    })
+
+    // Display modal content based on the link that was clicked. //
     $('.modalLink').click(function (e) {
         switch (e.target.text) {
             case 'Search':
@@ -318,24 +429,24 @@ $(document).ready(function () {
 
     });
 
+    // jQuery.autocomplete function for the search bar. //
     $("#searchBox").autocomplete({
         source: function (request, response) {
             var results = $.ui.autocomplete.filter(Object.keys(neighbourhoods), request.term);
             response(results.slice(0, 10));
         },
-
-        select: function (e) {
-            var point = neighbourhoods[e.currentTarget.childNodes[0].innerText];
-            createMap(new Microsoft.Maps.Location(point.lat, point.long), false, true);
-        },
     });
 
-    copyToClipboard = function (e) {
-        var $temp = $("<input>");
-        $("body").append($temp);
-        $temp.val(String(e.getLocation().latitude) + ", " + String(e.getLocation().longitude)).select();
-        document.execCommand("copy");
-        $temp.remove();
+    // When an autocomplete option is selected, moves the map to that area as defined in JSON. //
+    $('#searchBox').on('autocompleteselect', function (e, ui) {
+        let point = neighbourhoods[ui.item.value];
+        createMap(new Microsoft.Maps.Location(point.lat, point.long), false, true, "", true);
+    });
+
+    // Fix for autocomplete size. //
+    jQuery.ui.autocomplete.prototype._resizeMenu = function () {
+        var ul = this.menu.element;
+        ul.outerWidth(this.element.outerWidth());
     }
 })
 

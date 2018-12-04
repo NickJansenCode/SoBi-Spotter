@@ -28,7 +28,7 @@
 
             <form class="mx-2 my-auto d-inline" id="search" onsubmit="return(false)">
                 <div class="input-group">
-                    <input type="text" class="form-control border border-right-0" id="searchBox" placeholder="Search For A Location">
+                    <input type="text" class="form-control border" id="searchBox" placeholder="Search For A Location">
                 </div>
             </form>
 
@@ -81,8 +81,37 @@
 
             <div id="mainContent" class="col-xs-12 col-md-9">
                 <div class="row" id="container">
-                    <div class="col-xs-12 col-md-5" id="directionsInputContainer"></div>
-                    <div class="col-xs-12 col-md-7" id="legend">
+                    <div class="col-xs-12 col-md-5" id="directionsContainer">
+                        <div class="row">
+                            <h3 style="border-bottom: 2px solid black">Directions</h3>
+                        </div>
+                        <div class="row">
+                            <h6>To: </h6>
+                            <select id="hubSelectA" class="hubSelect form-control form-control-sm ">
+                            </select>
+                        </div>
+
+                        <div class="row mt-1">
+                            <h6>From: </h6>
+                            <select id="hubSelectB" class="hubSelect form-control form-control-sm">
+                            </select>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="mr-2">
+                                <a id="calculateRouteBtn" class="btn btn-primary">Calculate Route</a>
+                            </div>
+
+                            <div>
+                                <a id="clearRouteBtn" class="btn btn-primary">Clear Route</a>
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                    <div class="col-xs-12 col-md-6" id="legend">
                         <div class="row">
                             <h3 style="border-bottom: 2px solid black"> Legend </h3>
                         </div>
@@ -111,7 +140,7 @@
 
                     </div>
                 </div>
-                <div id="container" class="row w-100 h-100">
+                <div id="container" class="row w-100 h-100 pt-2">
                     <div id="map" class="ml-3  my-auto w-100"> </div>
                 </div>
             </div>
